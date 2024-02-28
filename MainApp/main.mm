@@ -141,9 +141,9 @@ void myThread(){
 
 
 #import <Cocoa/Cocoa.h>
-
 #include "include/cef_application_mac.h"
 
+/*
 // Receives notifications from the application.
 @interface SimpleAppDelegate : NSObject <NSApplicationDelegate>
 
@@ -193,10 +193,10 @@ void myThread(){
 }
 
 - (void)tryToTerminateApplication:(NSApplication*)app {
-  SimpleHandler* handler = SimpleHandler::GetInstance();
-  if (handler && !handler->IsClosing()) {
-    handler->CloseAllBrowsers(false);
-  }
+  // SimpleHandler* handler = SimpleHandler::GetInstance();
+  // if (handler && !handler->IsClosing()) {
+  //   handler->CloseAllBrowsers(false);
+  // }
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:
@@ -204,53 +204,32 @@ void myThread(){
   return NSTerminateNow;
 }
 @end
+*/
 
 int main(int argc, char* argv[]) {
-    char path[250]{};
-    uint32_t exec_path_size = 250;
-    _NSGetExecutablePath(path, &exec_path_size);
     CefScopedLibraryLoader library_loader;
     if (!library_loader.LoadInMain()) {
       return 1;
     }
-    /*
-    for(auto i = 0; i < argc; i++) {
-      std::cout << argv[i] << std::endl;
-    }
-    */
-    
+
     CefMainArgs mainArgs(argc, argv);
-    CefRefPtr<CefCommandLine> command_line =
-        CefCommandLine::CreateCommandLine();
+    CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
     command_line->InitFromArgv(argc, argv);
     
     
     CefRefPtr<CefApp> app{};
     void* sandbox_info = nullptr;
-    
     auto exitCode = CefExecuteProcess(mainArgs, nullptr, sandbox_info);
     if(exitCode >= 0) {
-        // The sub-process has completed so return here.
         return exitCode;
     }
     
     auto frameworkPath = GetFrameworkPath(false);
-    std::string frameworkPath2 = "/Users/adriankalinowski/Library/Developer/Xcode/DerivedData/ScraiaMacOS-gtrsgfarfzdmaldtweykqymhrkkb/Build/Products/Debug/../Frameworks/Chromium Embedded Framework.framework/";
     CefSettings settings{};
     settings.no_sandbox = true;
-    // settings.windowless_rendering_enabled = true;
-    // settings.log_severity = LOGSEVERITY_DISABLE;
-    // settings.pro
+    
     CefString(&settings.accept_language_list) = "pl,pl-PL";
-
-    //CefString(&settings.framework_dir_path).FromASCII(frameworkPath2.c_str());
-    //CefString(&settings.main_bundle_path).FromASCII("/Users/adriankalinowski/Library/Developer/Xcode/DerivedData/ScraiaMacOS-gtrsgfarfzdmaldtweykqymhrkkb/Build/Products/Debug/../Frameworks/Chromium Embedded Framework.framework/");
-
-    // CefRefPtr<SimpleApp> app(new SimpleApp);
-
-    // Initialize the CEF browser process. May return false if initialization
-    // fails or if early exit is desired (for example, due to process singleton
-    // relaunch behavior).
+    
     if (!CefInitialize(mainArgs, settings, app.get(), nullptr)) {
       return 1;
     }
@@ -261,9 +240,7 @@ int main(int argc, char* argv[]) {
                                withObject:nil
                             waitUntilDone:NO];
     */
-    // Run the CEF message loop. This will block until CefQuitMessageLoop() is
-    // called.
-    // CefRunMessageLoop();
+
     std::thread ths(myThread);
     CefRunMessageLoop();
     while(1) {
